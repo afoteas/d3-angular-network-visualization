@@ -1,4 +1,4 @@
-export interface nodeLocation{
+export interface NodeLocation {
     xAxis: Float32Array;
     yAxis: Float32Array;
 }

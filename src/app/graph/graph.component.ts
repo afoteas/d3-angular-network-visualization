@@ -2,7 +2,8 @@ import {Component, ElementRef, Input, NgModule, OnInit, OnChanges, AfterViewInit
 import {BrowserModule} from '@angular/platform-browser';
 import {miserables} from './data';
 import * as d3 from 'd3';
-import {nodeLocation} from './NodeLocationInterface';
+import {NodeLocation} from './NodeLocationInterface';
+import { NodeImages } from './NodeImages';
 
 @Component({
   selector: 'app-graph',
@@ -25,16 +26,15 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   id = '111';
 
   nodeId: Array<string> = [];
-  xx: any[] = [];
+  xNodes: any[] = [];
   xxx = {};
-  yy: any[] = [];
+  yNodes: any[] = [];
   yyy = {};
 
   private tooltip1: any;
   private tooltip2: any;
   private tooltip3: any;
   private tooltip4: any;
-  private tooltip5: any;
   private tooltip6: any;
   private tooltip7: any;
   private tooltip8: any;
@@ -67,7 +67,7 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
     this.simulation = d3.forceSimulation()
       .force('charge', d3.forceManyBody())
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius(d => 50))
+      .force('collision', d3.forceCollide().radius(d => 60))
       .force('x', d3.forceX(width))
       .force('y', d3.forceY(height));
 
@@ -84,7 +84,6 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ticked() {
-    console.log('render');
     const t = this;
     let xw: any = '';
     let yw: any = '';
@@ -94,35 +93,36 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
     this.node
       .attr('cx', d => {
         t.xxx = {id: d.id, x: d.x};
-        t.xx.push(t.xxx);
+        t.xNodes.push(t.xxx);
         return d.x; })
       .attr('cy', d => {
         t.yyy = {id: d.id, y: d.y};
-        t.yy.push(t.yyy);
+        t.yNodes.push(t.yyy);
         return d.y; })
       .attr('x', d => {
-         return d.x - 12; })
+         return d.x; })
       .attr('y', d => {
-        return d.y - 12; });
+        return d.y; });
 
     this.link
       .attr('x1', d => {
         const source = d.source;
-        for (let index = 0; index < t.xx.length; index++) {
-          if (source === t.xx[index].id) {
-            xw = t.xx[index].x;
-            t.xx.splice(index, 1);
+        for (let index = 0; index < t.xNodes.length; index++) {
+          if (source === t.xNodes[index].id) {
+            xw = t.xNodes[index].x;
+            t.xNodes.splice(index, 1);
             break;
           }
         }
+        console.log(xw);
         return xw; })
 
       .attr('y1', d => {
         const source = d.source;
-        for (let index = 0; index < t.yy.length; index++) {
-          if (source === t.yy[index].id) {
-            yw = t.yy[index].y;
-            t.yy.splice(index, 1);
+        for (let index = 0; index < t.yNodes.length; index++) {
+          if (source === t.yNodes[index].id) {
+            yw = t.yNodes[index].y;
+            t.yNodes.splice(index, 1);
             break;
           }
         }
@@ -130,10 +130,10 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
 
       .attr('x2', d => {
         const target = d.target;
-        for (let index = 0; index < t.xx.length; index++) {
-          if (target === t.xx[index].id) {
-            xw1 = t.xx[index].x;
-            t.xx.splice(index, 1);
+        for (let index = 0; index < t.xNodes.length; index++) {
+          if (target === t.xNodes[index].id) {
+            xw1 = t.xNodes[index].x;
+            t.xNodes.splice(index, 1);
             break;
           }
         }
@@ -141,10 +141,10 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
 
       .attr('y2', d => {
         const target = d.target;
-        for (let index = 0; index < t.yy.length; index++) {
-          if (target === t.yy[index].id) {
-            yw1 = t.yy[index].y;
-            t.yy.splice(index, 1);
+        for (let index = 0; index < t.yNodes.length; index++) {
+          if (target === t.yNodes[index].id) {
+            yw1 = t.yNodes[index].y;
+            t.yNodes.splice(index, 1);
             break;
           }
         }
@@ -194,20 +194,14 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
           .attr('x', posX + 10)
           .attr('y', posY - 60)
           .text('Model : ' + d.model);
-        this.tooltip5 = this.gDraw.append('text')
-          .attr('font-family', 'Comic Sans MS')
-          .attr('font-size', '14px')
-          .attr('fill', 'voilet');
-        this.tooltip5
-          .attr('x', posX + 10)
-          .attr('y', posY - 45)
-          .text('Eigenvector centrality: ' + d.eigenvectorCentrality);
+
+
       }).on('mouseout', () => {
           this.tooltip1.style('visibility', 'hidden');
           this.tooltip2.style('visibility', 'hidden');
           this.tooltip3.style('visibility', 'hidden');
           this.tooltip4.style('visibility', 'hidden');
-          this.tooltip5.style('visibility', 'hidden');
+
       }).on('mousemove', (d: any) => {
         d3.select('.chart-tooltip1')
         .style('left', d3.event.pageX + 15 + 'px')
@@ -274,35 +268,37 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
       .attr('stroke-width', d => Math.sqrt(d.value))
       .attr('stroke', (d) => 'Grey');
 
-    // tslint:disable-next-line:max-line-length
-    const svgRouter = '<g class="trans"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10s10-4.5 10-10S17.5 2 12 2m0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8s8 3.58 8 8s-3.58 8-8 8m1-7v3h2l-3 3l-3-3h2v-3m-6 0h3v2l3-3l-3-3v2H5m6 0V8H9l3-3l3 3h-2v3m6 0h-3V9l-3 3l3 3v-2h3" /></g>';
-    const svgWifi =  '<g class="trans"><path d="M4.93 4.93A9.969 9.969 0 0 0 2 12c0 2.76 1.12 5.26 2.93 7.07l1.41-1.41A7.938 7.938 0 0 1 4 12c0-2.21.89-4.22 2.34-5.66L4.93 4.93m14.14 0l-1.41 1.41A7.955 7.955 0 0 1 20 12c0 2.22-.89 4.22-2.34 5.66l1.41 1.41A9.969 9.969 0 0 0 22 12c0-2.76-1.12-5.26-2.93-7.07M7.76 7.76A5.98 5.98 0 0 0 6 12c0 1.65.67 3.15 1.76 4.24l1.41-1.41A3.99 3.99 0 0 1 8 12c0-1.11.45-2.11 1.17-2.83L7.76 7.76m8.48 0l-1.41 1.41A3.99 3.99 0 0 1 16 12c0 1.11-.45 2.11-1.17 2.83l1.41 1.41A5.98 5.98 0 0 0 18 12c0-1.65-.67-3.15-1.76-4.24M12 10a2 2 0 0 0-2 2a2 2 0 0 0 2 2a2 2 0 0 0 2-2a2 2 0 0 0-2-2z"/></g>';
-
     this.node = this.gDraw.append('g')
       .attr('class', 'nodes')
       .selectAll()
       .data(graph.nodes)
-      .enter().append('svg')
-      .attr('class', 'svg-class')
-      // .attr('width', '24')
-      // .attr('height', '24')
-      // .attr('viewBox', '0 0 24 24')
+      .enter()
+      .append('svg')
+      .attr('width', '40')
+      .attr('height', '40')
+      .attr('viewBox', '0 0 40 40')
       .attr('overflow', 'visible')
-      // .attr('transform-origin', '10 0')
-      // .attr('preserveAspectRadio', 'xMidYMid')
-      .attr('style',
-        'display: flex;' +
-        'justify-content: center;' +
-        'align-items: center;'
-     )
       .html((d) => {
-        if (d.type === 'core') {
-          return svgRouter;
+        if (d.type === 'router') {
+          if (d.status === 'up') {
+            return this.networkElementImage('-20', '-20', 'router-green.png');
+          } else {
+            return this.networkElementImage('-20', '-20', 'router-red.png');
+          }
+        } else if (d.type === 'switch') {
+          if (d.status === 'up') {
+            return this.networkElementImage('-20', '-20', 'switch-green.png');
+          } else {
+            return this.networkElementImage('-20', '-20', 'switch-red.png');
+          }
         } else {
-          return svgWifi;
+          if (d.status === 'up') {
+            return this.networkElementImage('-20', '-35', 'wifi-6-green.png');
+          } else {
+            return this.networkElementImage('-20', '-35', 'wifi-6-red.png');
+          }
         }
       })
-      .attr('fill', (d) => this.color(d.group))
       .call(d3.drag()
         .on('start', (d) => this.dragstarted(d))
         .on('drag', (d) => this.dragged(d))
@@ -313,9 +309,28 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
 
     this.gDraw.call(d3.zoom().on('zoom',  (d) =>  {
       console.log('trans');
-      // console.log(d3.event.transform);
+      console.log(d3.event);
+      // this.link.attr('transform', 'matrix(' + d3.event.transform.k + ',0,0,' + d3.event.transform.k +
+      //   ',' + d3.event.transform.x + ',' + d3.event.transform.y + ')');
+      // let moveX ;
+      // let moveY ;
+      // if (d3.event.sourceEvent.type === 'wheel') {
+      //   moveX = d3.event.transform.x + d3.event.sourceEvent.x;
+      //   moveY = d3.event.transform.y + d3.event.sourceEvent.y;
+      // } else {
+      //  moveX = d3.event.transform.x;
+      //  moveY = d3.event.transform.y;
+      // }
+
+      d3.selectAll('.trans').attr('transform', () => {
+
+        return 'matrix(1,0,0,1,' + d3.event.transform.x + ',' + d3.event.transform.y + ')';
+      }).attr('transform-origin', () => {
+        console.log(d3.event.sourceEvent.type);
+        return''; })
+      ;
       this.link.attr('transform', 'matrix(1,0,0,1,' + d3.event.transform.x + ',' + d3.event.transform.y + ')');
-      d3.selectAll('.trans').attr('transform', 'matrix(1,0,0,1,' + d3.event.transform.x + ',' + d3.event.transform.y + ')');
+      // d3.selectAll('.trans').attr('transform', d3.event.transform);
      }));
 
     this.simulation
@@ -345,5 +360,11 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+  }
+
+  networkElementImage(x, y, name) {
+    return '<image class="trans" ' +
+      'width="40" height="40" x="'
+      + x + '" y="' + y + '" href="/assets/images/' + name + '"/>';
   }
 }

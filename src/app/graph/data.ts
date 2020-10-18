@@ -2,49 +2,100 @@ export let miserables = {
   organization: 'COMSATS Institute of Information Technology',
   nodes: [
   {
-    id: '5cd95769833d160885ab3028',
-    name: 'Zulfiqar Ali',
+    id: '123',
+    details: 'Zulfiqar Ali',
     group: 1,
     model: 'Cisco 456',
-    type: 'core',
+    type: 'switch',
     location : 'Athens',
     status : 'up',
 
   },
   {
     id: '000',
-    name: 'Hai Hong Le',
+    details: 'Hai Hong Le',
     group: 0,
     model: 'Ruckus 332',
-    type: 'edge',
+    type: 'ap',
     location : 'Athens',
     status : 'up',
 
   },
   {
     id: '111',
-    name: 'Sybill Ilisch',
+    details: 'Sybill Ilisch',
     group: 0,
     model: 'Cambuim 43',
     location : 'Athens',
-    type: 'edge',
+    type: 'ap',
     status : 'up',
 
   },
   {
     id: '222',
-    name: 'Thomas Thurn-Albrecht',
+    details: 'Thomas Thurn-Albrecht',
     group: 0,
     model: 'Xirrus r43',
     location : 'Athens',
-    type: 'edge',
-    status : 'up',
+    type: 'ap',
+    status : 'down',
 
+  },
+  {
+    id: '333',
+    details: 'Thomas Thurn-Albrecht',
+    group: 0,
+    model: 'Xirrus r43',
+    location : 'Athens',
+    type: 'ap',
+    status : 'down',
+  },
+  {
+    id: '444',
+    details: 'Thomas Thurn-Albrecht',
+    group: 0,
+    model: 'Cisco 443',
+    location : 'Athens',
+    type: 'router',
+    status : 'up',
+  },
+  {
+    id: '555',
+    details: 'Thomas Thurn-Albrecht',
+    group: 0,
+    model: 'Cisco 443',
+    location : 'Athens',
+    type: 'switch',
+    status : 'up',
   }
-],
+  ],
   links: [
   {
-    source: '5cd95769833d160885ab3028',
+    source: '444',
+    target: '555',
+    value: 3,
+    status: 'Up',
+    type: 'optical',
+    speed: 10000
+  },
+  // {
+  //   source: '444',
+  //   target: '123',
+  //   value: 3,
+  //   status: 'Up',
+  //   type: 'optical',
+  //   speed: 10000
+  // },
+  {
+    source: '555',
+    target: '333',
+    value: 3,
+    status: 'Up',
+    type: 'optical',
+    speed: 10000
+  },
+  {
+    source: '123',
     target: '000',
     value: 3,
     status: 'Up',
@@ -52,7 +103,7 @@ export let miserables = {
     speed: 10000
   },
   {
-    source: '5cd95769833d160885ab3028',
+    source: '123',
     target: '111',
     value: 3,
     status: 'Up',
@@ -60,7 +111,7 @@ export let miserables = {
     speed: 10000
   },
   {
-    source: '5cd95769833d160885ab3028',
+    source: '123',
     target: '222',
     value: 3,
     status: 'Up',
