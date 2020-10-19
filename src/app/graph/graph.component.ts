@@ -4,6 +4,7 @@ import {miserables} from './data';
 import * as d3 from 'd3';
 import {NodeLocation} from './NodeLocationInterface';
 import { NodeImages } from './NodeImages';
+import {ForceLink} from 'd3-force';
 
 @Component({
   selector: 'app-graph',
@@ -64,7 +65,14 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
       return this.link.value + 20;
     }
 
-    this.simulation = d3.forceSimulation()
+    const links = miserables.links.map(d => Object.create(d));
+    const nodes = miserables.nodes.map(d => Object.create(d));
+
+    this.simulation = d3.forceSimulation(nodes)
+      .force('link', d3.forceLink(links).id(d => {
+
+        return miserables.nodes[d.index].id;
+      }))
       .force('charge', d3.forceManyBody())
       .force('center', d3.forceCenter(width / 2, height / 2))
       .force('collision', d3.forceCollide().radius(d => 60))
@@ -84,71 +92,20 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ticked() {
-    const t = this;
-    let xw: any = '';
-    let yw: any = '';
-    let xw1: any = '';
-    let yw1: any = '';
 
-    this.node
-      .attr('cx', d => {
-        t.xxx = {id: d.id, x: d.x};
-        t.xNodes.push(t.xxx);
-        return d.x; })
-      .attr('cy', d => {
-        t.yyy = {id: d.id, y: d.y};
-        t.yNodes.push(t.yyy);
-        return d.y; })
-      .attr('x', d => {
-         return d.x; })
-      .attr('y', d => {
-        return d.y; });
+
+    console.log(this.node)
 
     this.link
-      .attr('x1', d => {
-        const source = d.source;
-        for (let index = 0; index < t.xNodes.length; index++) {
-          if (source === t.xNodes[index].id) {
-            xw = t.xNodes[index].x;
-            t.xNodes.splice(index, 1);
-            break;
-          }
-        }
-        console.log(xw);
-        return xw; })
+      .attr('x1', d => d.source.x)
+      .attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x)
+      .attr('y2', d => d.target.y);
 
-      .attr('y1', d => {
-        const source = d.source;
-        for (let index = 0; index < t.yNodes.length; index++) {
-          if (source === t.yNodes[index].id) {
-            yw = t.yNodes[index].y;
-            t.yNodes.splice(index, 1);
-            break;
-          }
-        }
-        return yw; })
+    this.node
+      .attr('x', d => d.x)
+      .attr('y', d => d.y);
 
-      .attr('x2', d => {
-        const target = d.target;
-        for (let index = 0; index < t.xNodes.length; index++) {
-          if (target === t.xNodes[index].id) {
-            xw1 = t.xNodes[index].x;
-            t.xNodes.splice(index, 1);
-            break;
-          }
-        }
-        return xw1; })
-
-      .attr('y2', d => {
-        const target = d.target;
-        for (let index = 0; index < t.yNodes.length; index++) {
-          if (target === t.yNodes[index].id) {
-            yw1 = t.yNodes[index].y;
-            t.yNodes.splice(index, 1);
-            break;
-          }
-        }
-        return yw1; });
 
     this.node
     .on('mouseover',
@@ -337,8 +294,8 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
       .nodes(graph.nodes)
       .on('tick', () => this.ticked());
 
-    // this.simulation.force('link')
-    //   .links(graph.links);
+    this.simulation.force('link')
+      .links(graph.links);
   }
 
   dragged(d) {
