@@ -11,12 +11,9 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   name: string;
   svg;
   gMain;
-  height;
-  width;
   rect;
   gDraw;
   zoom;
-  color;
   simulation;
   link;
   node;
@@ -33,18 +30,27 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   miserables;
 
+  @Input()
+  width;
+
+  @Input()
+  height;
+
   constructor() { }
 
   ngOnInit() {
+    console.log(this.height);
+    console.log(this.width);
   }
 
   ngAfterViewInit() {
     this.svg = d3.select('svg');
 
-    const width = +this.svg.attr('width');
-    const height = +this.svg.attr('height');
+    // const width = +this.svg.attr('width');
+    // const height = +this.svg.attr('height');
 
-    this.color = d3.scaleOrdinal(d3.schemeCategory10);
+    const width = +this.width;
+    const height = +this.height;
 
 
     const links = this.miserables.links.map(d => Object.create(d));
@@ -54,11 +60,25 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
       .force('link', d3.forceLink(links).id(d => {
         return this.miserables.nodes[d.index].id;
       }))
-      .force('charge', d3.forceManyBody())
+      .force('charge', d3.forceManyBody().strength((d) => {
+        if (this.miserables.nodes[d.index].type === 'router') {
+          return -1000;
+        } else if (this.miserables.nodes[d.index].type === 'switch') {
+          return +100;
+        } else {return -1000; }
+      }))
       .force('center', d3.forceCenter(width / 2, height / 2))
-      .force('collision', d3.forceCollide().radius(d => 60))
+      .force('collision', d3.forceCollide().radius((d) => {
+        if (this.miserables.nodes[d.index].type === 'router') {
+          return 60;
+        } else if (this.miserables.nodes[d.index].type === 'switch') {
+          return 40;
+        } else {return 20; }
+      }))
       .force('x', d3.forceX(width))
       .force('y', d3.forceY(height));
+
+
 
     this.gMain = this.svg.append('g')
       .classed('g-main', true);
@@ -207,7 +227,16 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
       .on('tick', () => this.ticked());
 
     this.simulation.force('link')
-      .links(graph.links);
+      .links(graph.links)
+      .distance((d) => {
+        if (this.miserables.links[d.index].id === 'link1' || this.miserables.links[d.index].id === 'link2') {
+          return 200;
+        } else  {
+          return 60;
+        }
+      }
+      )
+      ;
   }
 
   dragged(d) {
