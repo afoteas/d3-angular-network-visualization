@@ -1,6 +1,6 @@
 .d3-miserables {
   width: 100%;
-  height: 800px;
+  height: 500px !important;
   border: 1px solid #ccc!important;
   border-radius: 16px;
 }
@@ -18,20 +18,4 @@
 .nodes svg {
   stroke: #5dff03;
   stroke-width: 5px;
-}
-
-/*Transform Colors
-https://codepen.io/sosuke/pen/Pjoqqp
-https://www.hiclipart.com/
-*/
-.green-col {
-  filter: invert(22%) sepia(50%) saturate(5816%) hue-rotate(94deg) brightness(99%) contrast(104%);
-}
-
-.red-col {
-  filter: invert(16%) sepia(58%) saturate(7043%) hue-rotate(357deg) brightness(91%) contrast(93%);
-}
-
-.orange-col {
-  filter: invert(69%) sepia(93%) saturate(2420%) hue-rotate(359deg) brightness(101%) contrast(106%);
 }

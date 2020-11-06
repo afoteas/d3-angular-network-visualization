@@ -1,4 +1,4 @@
-import {Component, Input, OnInit, AfterViewInit, OnDestroy} from '@angular/core';
+import {Component, Input, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef} from '@angular/core';
 import * as d3 from 'd3';
 import {networkElements} from './networkElements';
 
@@ -36,6 +36,10 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input()
   height;
 
+  @ViewChild('topology', {read: ElementRef, static: false }) topoView: ElementRef;
+
+
+  // constructor(private el: ElementRef) { }
   constructor() { }
 
   ngOnInit() {
@@ -43,15 +47,21 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
     console.log(this.width);
   }
 
+  onResize(event) {
+      console.log('resize');
+      console.log(event.target.innerWidth);
+      console.log(event.target.innerHeight);
+      console.log(this.topoView.nativeElement.offsetWidth);
+      console.log(this.topoView.nativeElement.offsetHeight);
+      this.ngAfterViewInit();
+      // console.log(this.el.nativeElement.offsetWidth);
+      // console.log(this.el.nativeElement.offsetHeight);
+  }
+
   ngAfterViewInit() {
     this.svg = d3.select('svg');
-
-    // const width = +this.svg.attr('width');
-    // const height = +this.svg.attr('height');
-
-    const width = +this.width;
-    const height = +this.height;
-
+    const width = +this.topoView.nativeElement.offsetWidth;
+    const height = +this.topoView.nativeElement.offsetHeight;
 
     const links = this.miserables.links.map(d => Object.create(d));
     const nodes = this.miserables.nodes.map(d => Object.create(d));
@@ -214,8 +224,6 @@ export class GraphComponent implements OnInit, AfterViewInit, OnDestroy {
       d3.selectAll('.trans').attr('transform', () => {
         return 'matrix(0.01,0,0,-0.01,' + (-35 + d3.event.transform.x) + ',' + (-5 + d3.event.transform.y) + ')';
       }).attr('transform-origin', () => {
-        console.log(d3.event.sourceEvent.type);
-        console.log(d3.event.transform);
         return 'center'; })
       ;
       this.link.attr('transform', 'matrix(1,0,0,1,' + d3.event.transform.x + ',' + d3.event.transform.y + ')');

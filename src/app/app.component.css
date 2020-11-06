@@ -1,4 +1,6 @@
 .limits {
 
-  width: 200px;
+  max-width: 500px;
+  max-height: 500px ;
+  height: 500px;
 }
